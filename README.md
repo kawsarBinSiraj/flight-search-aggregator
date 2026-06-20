@@ -45,10 +45,8 @@ A modern, full-featured flight search and booking aggregator built with **Next.j
 - **Cookie-based token storage** with `js-cookie`
 - **Middleware route guards** — protected routes redirect to login with callback URL
 - **Auth-only route protection** — logged-in users redirected away from login/signup
-- **Password reset flow** with email-based mock OTP verification
 
 ### User Experience
-- **Dark/Light theme** toggle via `next-themes`
 - **Responsive design** with mobile-first Tailwind CSS
 - **Loading skeletons** for smooth perceived performance
 - **Toast notifications** via Sonner
@@ -75,7 +73,6 @@ A modern, full-featured flight search and booking aggregator built with **Next.j
 | **OAuth** | @react-oauth/google | ^0.13.4 |
 | **Date Utils** | date-fns | ^4.4.0 |
 | **Icons** | Lucide React | ^0.576.0 |
-| **Theming** | next-themes | ^0.4.6 |
 | **Toasts** | Sonner | ^2.0.7 |
 
 ---
