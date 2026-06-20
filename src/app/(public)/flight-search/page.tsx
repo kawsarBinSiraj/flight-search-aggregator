@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import FlightSearchPanel from "@/components/features/flight/flight-search-panel";
 
@@ -9,7 +10,9 @@ export const metadata: Metadata = {
 export default function FlightSearchPage() {
     return (
         <div className="py-0">
-            <FlightSearchPanel />
+            <Suspense>
+                <FlightSearchPanel />
+            </Suspense>
         </div>
     );
 }
