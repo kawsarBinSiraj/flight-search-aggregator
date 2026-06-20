@@ -1,117 +1,218 @@
 import type { Flight, Airport, Airline } from "@/types";
 
 const airports: Airport[] = [
-  { code: "JFK", city: "New York", name: "John F. Kennedy International", country: "USA" },
-  { code: "LAX", city: "Los Angeles", name: "Los Angeles International", country: "USA" },
-  { code: "ORD", city: "Chicago", name: "O'Hare International", country: "USA" },
-  { code: "LHR", city: "London", name: "Heathrow", country: "UK" },
-  { code: "CDG", city: "Paris", name: "Charles de Gaulle", country: "France" },
-  { code: "DXB", city: "Dubai", name: "Dubai International", country: "UAE" },
-  { code: "SIN", city: "Singapore", name: "Changi", country: "Singapore" },
-  { code: "NRT", city: "Tokyo", name: "Narita International", country: "Japan" },
+    { code: "JFK", city: "New York", name: "John F. Kennedy International", country: "USA" },
+    { code: "LAX", city: "Los Angeles", name: "Los Angeles International", country: "USA" },
+    { code: "ORD", city: "Chicago", name: "O'Hare International", country: "USA" },
+    { code: "LHR", city: "London", name: "Heathrow", country: "UK" },
+    { code: "CDG", city: "Paris", name: "Charles de Gaulle", country: "France" },
+    { code: "DXB", city: "Dubai", name: "Dubai International", country: "UAE" },
+    { code: "SIN", city: "Singapore", name: "Changi", country: "Singapore" },
+    { code: "NRT", city: "Tokyo", name: "Narita International", country: "Japan" },
+    { code: "SFO", city: "San Francisco", name: "San Francisco International", country: "USA" },
+    { code: "MIA", city: "Miami", name: "Miami International", country: "USA" },
+    { code: "FRA", city: "Frankfurt", name: "Frankfurt Airport", country: "Germany" },
+    { code: "HND", city: "Tokyo", name: "Haneda", country: "Japan" },
+    { code: "BKK", city: "Bangkok", name: "Suvarnabhumi", country: "Thailand" },
+    { code: "SYD", city: "Sydney", name: "Sydney Airport", country: "Australia" },
 ];
 
 const airlines: Airline[] = [
-  { code: "AA", name: "American Airlines", logo: "🇺🇸" },
-  { code: "DL", name: "Delta Air Lines", logo: "🔺" },
-  { code: "UA", name: "United Airlines", logo: "🌍" },
-  { code: "BA", name: "British Airways", logo: "🇬🇧" },
-  { code: "LH", name: "Lufthansa", logo: "🇩🇪" },
-  { code: "EK", name: "Emirates", logo: "🇦🇪" },
-  { code: "SQ", name: "Singapore Airlines", logo: "🇸🇬" },
-  { code: "AF", name: "Air France", logo: "🇫🇷" },
-  { code: "JL", name: "Japan Airlines", logo: "🇯🇵" },
-  { code: "QF", name: "Qantas", logo: "🇦🇺" },
+    { code: "AA", name: "American Airlines", logo: "🇺🇸" },
+    { code: "DL", name: "Delta Air Lines", logo: "🔺" },
+    { code: "UA", name: "United Airlines", logo: "🌍" },
+    { code: "BA", name: "British Airways", logo: "🇬🇧" },
+    { code: "LH", name: "Lufthansa", logo: "🇩🇪" },
+    { code: "EK", name: "Emirates", logo: "🇦🇪" },
+    { code: "SQ", name: "Singapore Airlines", logo: "🇸🇬" },
+    { code: "AF", name: "Air France", logo: "🇫🇷" },
+    { code: "JL", name: "Japan Airlines", logo: "🇯🇵" },
+    { code: "QF", name: "Qantas", logo: "🇦🇺" },
 ];
 
-const jfk = airports[0];
-const lax = airports[1];
+const aircraftPool = ["Boeing 737", "Airbus A320", "Boeing 787", "Airbus A350", "Boeing 777", "Airbus A380", "Boeing 767", "Airbus A330"];
 
-function generateFlights(): Flight[] {
-  const flights: Flight[] = [];
-  const baseDate = "2026-07-15";
+// Route definitions: origin, destination, base nonstop duration (min), base price
+const routeDefinitions: Array<{
+    origin: Airport;
+    destination: Airport;
+    baseDuration: number;
+    basePrice: number;
+}> = [
+    // Domestic USA
+    { origin: airports[0], destination: airports[1], baseDuration: 355, basePrice: 349 }, // JFK → LAX
+    { origin: airports[1], destination: airports[0], baseDuration: 320, basePrice: 359 }, // LAX → JFK
+    { origin: airports[0], destination: airports[8], baseDuration: 370, basePrice: 379 }, // JFK → SFO
+    { origin: airports[8], destination: airports[0], baseDuration: 330, basePrice: 369 }, // SFO → JFK
+    { origin: airports[2], destination: airports[1], baseDuration: 255, basePrice: 279 }, // ORD → LAX
+    { origin: airports[0], destination: airports[2], baseDuration: 150, basePrice: 189 }, // JFK → ORD
+    { origin: airports[0], destination: airports[9], baseDuration: 195, basePrice: 219 }, // JFK → MIA
+    { origin: airports[9], destination: airports[1], baseDuration: 310, basePrice: 309 }, // MIA → LAX
 
-  const flightTemplates = [
-    // Non-stop flights
-    { airline: airlines[0], flightNum: "AA 101", depHour: 6, depMin: 30, duration: 355, price: 389, stops: "nonstop" as const, seats: 42, refundable: true, tags: ["Best Value"] },
-    { airline: airlines[1], flightNum: "DL 205", depHour: 8, depMin: 15, duration: 360, price: 412, stops: "nonstop" as const, seats: 28, refundable: true, tags: ["Popular"] },
-    { airline: airlines[2], flightNum: "UA 310", depHour: 10, depMin: 0, duration: 365, price: 375, stops: "nonstop" as const, seats: 55, refundable: false },
-    { airline: airlines[3], flightNum: "BA 178", depHour: 11, depMin: 45, duration: 350, price: 520, stops: "nonstop" as const, seats: 12, refundable: true, tags: ["Premium"] },
-    { airline: airlines[5], flightNum: "EK 201", depHour: 14, depMin: 30, duration: 380, price: 495, stops: "nonstop" as const, seats: 8, refundable: true },
-    { airline: airlines[6], flightNum: "SQ 25", depHour: 16, depMin: 0, duration: 370, price: 550, stops: "nonstop" as const, seats: 3, refundable: true, tags: ["Premium"] },
-    { airline: airlines[4], flightNum: "LH 401", depHour: 18, depMin: 20, duration: 375, price: 445, stops: "nonstop" as const, seats: 34, refundable: false },
-    { airline: airlines[7], flightNum: "AF 007", depHour: 20, depMin: 10, duration: 365, price: 430, stops: "nonstop" as const, seats: 19, refundable: true },
-    { airline: airlines[0], flightNum: "AA 109", depHour: 22, depMin: 0, duration: 355, price: 349, stops: "nonstop" as const, seats: 61, refundable: false, tags: ["Late Night Deal"] },
+    // Transatlantic
+    { origin: airports[0], destination: airports[3], baseDuration: 420, basePrice: 520 }, // JFK → LHR
+    { origin: airports[3], destination: airports[0], baseDuration: 480, basePrice: 540 }, // LHR → JFK
+    { origin: airports[0], destination: airports[4], baseDuration: 450, basePrice: 495 }, // JFK → CDG
+    { origin: airports[4], destination: airports[0], baseDuration: 510, basePrice: 505 }, // CDG → JFK
+    { origin: airports[2], destination: airports[3], baseDuration: 510, basePrice: 560 }, // ORD → LHR
+    { origin: airports[1], destination: airports[3], baseDuration: 645, basePrice: 680 }, // LAX → LHR
+    { origin: airports[3], destination: airports[5], baseDuration: 420, basePrice: 480 }, // LHR → DXB
 
-    // 1-stop flights
-    { airline: airlines[2], flightNum: "UA 550", depHour: 5, depMin: 45, duration: 510, price: 285, stops: "1-stop" as const, seats: 44, refundable: false, tags: ["Cheapest"] },
-    { airline: airlines[1], flightNum: "DL 422", depHour: 7, depMin: 30, duration: 485, price: 310, stops: "1-stop" as const, seats: 37, refundable: false },
-    { airline: airlines[0], flightNum: "AA 335", depHour: 9, depMin: 15, duration: 495, price: 298, stops: "1-stop" as const, seats: 52, refundable: false, tags: ["Budget Friendly"] },
-    { airline: airlines[4], flightNum: "LH 450", depHour: 12, depMin: 0, duration: 520, price: 365, stops: "1-stop" as const, seats: 25, refundable: true },
-    { airline: airlines[7], flightNum: "AF 120", depHour: 13, depMin: 45, duration: 500, price: 340, stops: "1-stop" as const, seats: 30, refundable: false },
-    { airline: airlines[5], flightNum: "EK 215", depHour: 15, depMin: 20, duration: 530, price: 385, stops: "1-stop" as const, seats: 18, refundable: true },
-    { airline: airlines[6], flightNum: "SQ 77", depHour: 17, depMin: 10, duration: 505, price: 410, stops: "1-stop" as const, seats: 22, refundable: false },
-    { airline: airlines[3], flightNum: "BA 285", depHour: 19, depMin: 0, duration: 490, price: 378, stops: "1-stop" as const, seats: 31, refundable: true },
-    { airline: airlines[8], flightNum: "JL 60", depHour: 21, depMin: 30, duration: 540, price: 325, stops: "1-stop" as const, seats: 15, refundable: false },
-    { airline: airlines[9], flightNum: "QF 12", depHour: 23, depMin: 15, duration: 515, price: 355, stops: "1-stop" as const, seats: 40, refundable: true },
+    // Middle East
+    { origin: airports[0], destination: airports[5], baseDuration: 720, basePrice: 695 }, // JFK → DXB
+    { origin: airports[5], destination: airports[0], baseDuration: 780, basePrice: 720 }, // DXB → JFK
+    { origin: airports[3], destination: airports[5], baseDuration: 420, basePrice: 480 }, // LHR → DXB
 
-    // 2-stop flights
-    { airline: airlines[2], flightNum: "UA 880", depHour: 4, depMin: 0, duration: 720, price: 215, stops: "2-stop" as const, seats: 60, refundable: false, tags: ["Budget"] },
-    { airline: airlines[1], flightNum: "DL 660", depHour: 6, depMin: 0, duration: 690, price: 245, stops: "2-stop" as const, seats: 48, refundable: false },
-    { airline: airlines[0], flightNum: "AA 550", depHour: 9, depMin: 30, duration: 710, price: 230, stops: "2-stop" as const, seats: 55, refundable: false, tags: ["Budget"] },
-    { airline: airlines[4], flightNum: "LH 700", depHour: 11, depMin: 15, duration: 750, price: 275, stops: "2-stop" as const, seats: 20, refundable: false },
-    { airline: airlines[8], flightNum: "JL 85", depHour: 14, depMin: 0, duration: 735, price: 260, stops: "2-stop" as const, seats: 35, refundable: false },
-    { airline: airlines[9], flightNum: "QF 40", depHour: 16, depMin: 45, duration: 700, price: 250, stops: "2-stop" as const, seats: 42, refundable: false },
-    { airline: airlines[7], flightNum: "AF 300", depHour: 19, depMin: 30, duration: 680, price: 240, stops: "2-stop" as const, seats: 38, refundable: false },
-    { airline: airlines[5], flightNum: "EK 405", depHour: 22, depMin: 30, duration: 760, price: 290, stops: "2-stop" as const, seats: 14, refundable: false },
-    { airline: airlines[3], flightNum: "BA 410", depHour: 1, depMin: 30, duration: 740, price: 220, stops: "2-stop" as const, seats: 50, refundable: false, tags: ["Red Eye Budget"] },
-    { airline: airlines[6], flightNum: "SQ 90", depHour: 3, depMin: 0, duration: 770, price: 270, stops: "2-stop" as const, seats: 26, refundable: false },
-    { airline: airlines[1], flightNum: "DL 890", depHour: 8, depMin: 0, duration: 705, price: 238, stops: "2-stop" as const, seats: 33, refundable: false },
-    { airline: airlines[2], flightNum: "UA 999", depHour: 13, depMin: 0, duration: 695, price: 225, stops: "2-stop" as const, seats: 45, refundable: false },
-    { airline: airlines[0], flightNum: "AA 777", depHour: 15, depMin: 30, duration: 715, price: 255, stops: "2-stop" as const, seats: 29, refundable: false },
-  ];
+    // Asia
+    { origin: airports[1], destination: airports[6], baseDuration: 1020, basePrice: 850 }, // LAX → SIN
+    { origin: airports[6], destination: airports[1], baseDuration: 1080, basePrice: 870 }, // SIN → LAX
+    { origin: airports[1], destination: airports[7], baseDuration: 690, basePrice: 720 }, // LAX → NRT
+    { origin: airports[7], destination: airports[1], baseDuration: 630, basePrice: 700 }, // NRT → LAX
+    { origin: airports[0], destination: airports[7], baseDuration: 840, basePrice: 890 }, // JFK → NRT
+    { origin: airports[5], destination: airports[6], baseDuration: 435, basePrice: 410 }, // DXB → SIN
+    { origin: airports[6], destination: airports[12], baseDuration: 150, basePrice: 185 }, // SIN → BKK
+    { origin: airports[3], destination: airports[7], baseDuration: 735, basePrice: 780 }, // LHR → NRT
 
-  flightTemplates.forEach((template, index) => {
-    const depHourStr = template.depHour.toString().padStart(2, "0");
-    const depMinStr = template.depMin.toString().padStart(2, "0");
-    const arrivalMinutes = template.depHour * 60 + template.depMin + template.duration;
-    const arrHour = Math.floor(arrivalMinutes / 60) % 24;
-    const arrMin = arrivalMinutes % 60;
-    const arrHourStr = arrHour.toString().padStart(2, "0");
-    const arrMinStr = arrMin.toString().padStart(2, "0");
+    // Europe internal
+    { origin: airports[3], destination: airports[4], baseDuration: 80, basePrice: 145 }, // LHR → CDG
+    { origin: airports[4], destination: airports[10], baseDuration: 85, basePrice: 155 }, // CDG → FRA
 
-    const arrivalDateOffset = arrHour < template.depHour ? 1 : 0;
-    const arrivalDate = new Date(baseDate);
-    arrivalDate.setDate(arrivalDate.getDate() + arrivalDateOffset);
+    // Oceania
+    { origin: airports[6], destination: airports[13], baseDuration: 480, basePrice: 520 }, // SIN → SYD
+    { origin: airports[1], destination: airports[13], baseDuration: 960, basePrice: 1100 }, // LAX → SYD
+];
 
-    flights.push({
-      id: `FL-${(index + 1).toString().padStart(3, "0")}`,
-      segments: [
-        {
-          airline: template.airline,
-          flightNumber: template.flightNum,
-          origin: jfk,
-          destination: lax,
-          departureTime: `${baseDate}T${depHourStr}:${depMinStr}:00`,
-          arrivalTime: `${arrivalDate.toISOString().split("T")[0]}T${arrHourStr}:${arrMinStr}:00`,
-          duration: template.duration,
-          aircraft: ["Boeing 737", "Airbus A320", "Boeing 787", "Airbus A350", "Boeing 777"][index % 5],
-        },
-      ],
-      totalPrice: template.price,
-      currency: "USD",
-      stops: template.stops,
-      totalDuration: template.duration,
-      isRefundable: template.refundable,
-      seatsAvailable: template.seats,
-      tags: template.tags,
-    });
-  });
+// ─── helpers ────────────────────────────────────────────────────
 
-  return flights;
+function formatDate(d: Date): string {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
 }
 
-export const mockFlights = generateFlights();
+/** Simple seeded PRNG (djb2) — deterministic per date so results are stable */
+function seededRandom(seed: number): () => number {
+    let s = seed % 2147483647;
+    if (s <= 0) s += 2147483646;
+    return () => {
+        s = (s * 16807) % 2147483647;
+        return (s - 1) / 2147483646;
+    };
+}
+
+function dateToSeed(dateStr: string): number {
+    let hash = 5381;
+    for (let i = 0; i < dateStr.length; i++) {
+        hash = ((hash << 5) + hash + dateStr.charCodeAt(i)) & 0xffffffff;
+    }
+    return Math.abs(hash);
+}
+
+// ─── pre-generate flights for today + next 10 days ──────────────
+
+function preGenerateAllFlights(): Flight[] {
+    const allFlights: Flight[] = [];
+    const today = new Date();
+
+    for (let dayOffset = 0; dayOffset <= 10; dayOffset++) {
+        const date = new Date(today);
+        date.setDate(date.getDate() + dayOffset);
+        const dateStr = formatDate(date);
+        const rand = seededRandom(dateToSeed(dateStr));
+
+        // Pick which routes operate today (~70-85% of all routes)
+        const todaysRoutes = routeDefinitions.filter(() => rand() < 0.78);
+
+        let flightCounter = 0;
+
+        for (const route of todaysRoutes) {
+            const { origin, destination, baseDuration, basePrice } = route;
+
+            // Pick 3-7 airlines for this route today
+            const numAirlines = 3 + Math.floor(rand() * 5);
+            const shuffledAirlines = [...airlines].sort(() => rand() - 0.5);
+            const selectedAirlines = shuffledAirlines.slice(0, numAirlines);
+
+            // Generate departure times spread across the day
+            const startHour = 4 + Math.floor(rand() * 3);
+
+            selectedAirlines.forEach((airline, idx) => {
+                flightCounter++;
+
+                // Vary departure time
+                const depHour = (startHour + idx * 2 + Math.floor(rand() * 2)) % 24;
+                const depMin = Math.floor(rand() * 4) * 15; // 0, 15, 30, 45
+
+                // Pick stop type: weighted towards nonstop and 1-stop
+                const stopRoll = rand();
+                let stops: "nonstop" | "1-stop" | "2-stop";
+                let duration: number;
+                let priceMultiplier: number;
+                if (stopRoll < 0.45) {
+                    stops = "nonstop";
+                    duration = baseDuration + Math.floor(rand() * 30) - 10;
+                    priceMultiplier = 1 + (rand() * 0.3 - 0.1);
+                } else if (stopRoll < 0.8) {
+                    stops = "1-stop";
+                    duration = Math.round(baseDuration * (1.45 + rand() * 0.2));
+                    priceMultiplier = 0.7 + rand() * 0.2;
+                } else {
+                    stops = "2-stop";
+                    duration = Math.round(baseDuration * (1.9 + rand() * 0.3));
+                    priceMultiplier = 0.5 + rand() * 0.15;
+                }
+
+                const price = Math.round(basePrice * priceMultiplier);
+                const seats = 3 + Math.floor(rand() * 60);
+                const refundable = stops === "nonstop" ? rand() > 0.4 : rand() > 0.75;
+
+                // Compute arrival
+                const depTotalMin = depHour * 60 + depMin;
+                const arrTotalMin = depTotalMin + duration;
+                const arrHour = Math.floor(arrTotalMin / 60) % 24;
+                const arrMin = arrTotalMin % 60;
+
+                const arrivalDateOffset = arrHour < depHour ? 1 : 0;
+                const arrivalDate = new Date(date);
+                arrivalDate.setDate(arrivalDate.getDate() + arrivalDateOffset);
+
+                const depHourStr = depHour.toString().padStart(2, "0");
+                const depMinStr = depMin.toString().padStart(2, "0");
+                const arrHourStr = arrHour.toString().padStart(2, "0");
+                const arrMinStr = arrMin.toString().padStart(2, "0");
+
+                const flightNum = `${airline.code} ${((flightCounter * 137 + dayOffset * 31) % 900) + 100}`;
+
+                allFlights.push({
+                    id: `FL-${dateStr}-${origin.code}-${destination.code}-${flightCounter.toString().padStart(3, "0")}`,
+                    segments: [
+                        {
+                            airline,
+                            flightNumber: flightNum,
+                            origin,
+                            destination,
+                            departureTime: `${dateStr}T${depHourStr}:${depMinStr}:00`,
+                            arrivalTime: `${formatDate(arrivalDate)}T${arrHourStr}:${arrMinStr}:00`,
+                            duration,
+                            aircraft: aircraftPool[(flightCounter + dayOffset) % aircraftPool.length],
+                        },
+                    ],
+                    totalPrice: price,
+                    currency: "USD",
+                    stops,
+                    totalDuration: duration,
+                    isRefundable: refundable,
+                    seatsAvailable: seats,
+                });
+            });
+        }
+    }
+
+    return allFlights;
+}
+
+export const mockFlights: Flight[] = preGenerateAllFlights();
 
 export const popularAirports: Airport[] = airports;
 

@@ -19,10 +19,16 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: "Passengers must be between 1 and 9." }, { status: 400 });
     }
 
-    // Filter flights matching origin/destination
+    // Filter flights by exact date match AND route
     const flights = mockFlights.filter((flight) => {
         const segment = flight.segments[0];
-        return segment.origin.code === origin && segment.destination.code === destination && flight.seatsAvailable >= passengers;
+        const flightDate = segment.departureTime.split("T")[0];
+        return (
+            flightDate === date &&
+            segment.origin.code === origin &&
+            segment.destination.code === destination &&
+            flight.seatsAvailable >= passengers
+        );
     });
 
     // Update prices based on passenger count
