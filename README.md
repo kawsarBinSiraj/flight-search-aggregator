@@ -106,9 +106,6 @@ NEXT_PUBLIC_API_BASE_URL=
 # JWT secret for token signing (fallback: dev secret built-in)
 NEXT_PUBLIC_JWT_SECRET=your-secret-key-here
 
-# Google OAuth Client ID
-NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id
-
 # Application URL
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
