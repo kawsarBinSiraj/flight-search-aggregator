@@ -1,5 +1,5 @@
 "use client";
-
+import { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -19,6 +19,7 @@ interface FlightSearchFormProps {
 
 export function FlightSearchForm({ isSearching, redirectPath }: FlightSearchFormProps) {
     const router = useRouter();
+    const [isPending, startTransition] = useTransition();
 
     // Pre-fill form from URL params or sensible defaults
     const searchParams = useSearchParams();
@@ -49,7 +50,9 @@ export function FlightSearchForm({ isSearching, redirectPath }: FlightSearchForm
             departureDate: data.departureDate,
             passengers: data.passengers.toString(),
         });
-        router.push(`${redirectPath || ROUTES.HOME}?${query.toString()}`);
+        startTransition(() => {
+            router.push(`${redirectPath || ROUTES.HOME}?${query.toString()}`);
+        });
     };
 
     return (
@@ -166,10 +169,10 @@ export function FlightSearchForm({ isSearching, redirectPath }: FlightSearchForm
                 type="submit"
                 size="lg"
                 className="absolute cursor-pointer opacity-100! -bottom-6 left-1/2 h-12 w-40 -translate-x-1/2 rounded-full bg-primary px-6 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/30 hover:bg-primary/90 sm:px-7"
-                disabled={isSearching}
+                disabled={isSearching || isPending}
             >
                 <Search className="mr-0 size-5" />
-                {isSearching ? "Searching..." : "Explore"}
+                {isSearching || isPending ? "Searching..." : "Explore"}
             </Button>
         </form>
     );

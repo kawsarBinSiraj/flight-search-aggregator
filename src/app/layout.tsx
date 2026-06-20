@@ -31,7 +31,7 @@ export default function RootLayout({
       <html lang="en" suppressHydrationWarning>
          <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
             <NextTopLoader color="var(--primary)" height={1} showSpinner={false} />
-            <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+            <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
                <QueryProvider>
                   {children}
                   <Toaster richColors closeButton duration={1500} />
